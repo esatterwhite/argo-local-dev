@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-world-ui
+spec:
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: hello-world-ui
+  template:
+    metadata:
+      labels:
+        app: hello-world-ui
+    spec:
+      containers:
+      - image: ghcr.io/esatterwhite/fallback-service:latest
+        name: hello-world-ui
+        ports:
+        - containerPort: 3000
