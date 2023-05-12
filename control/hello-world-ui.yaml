@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hello-world
+  namespace: argo
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: esatterwhite
+  source:
+    directory:
+      include: '*.yaml'
+      jsonnet: {}
+    path: hello-world-ui
+    repoURL: https://github.com/esatterwhite/argo-local-dev
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

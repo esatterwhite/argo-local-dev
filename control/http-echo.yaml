@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: http-echo
+  namespace: argo
+spec:
+  destination:
+    namespace: default
+    server: https://kubernetes.default.svc
+  project: esatterwhite
+  source:
+    directory:
+      include: '*.yaml'
+      jsonnet: {}
+    path: http-echo
+    repoURL: https://github.com/esatterwhite/argo-local-dev
+    targetRevision: HEAD
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
