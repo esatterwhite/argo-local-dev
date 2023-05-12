@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: http-echo
+  name: echo-service
   namespace: argo
 spec:
   destination:
@@ -12,7 +12,7 @@ spec:
     directory:
       include: '*.yaml'
       jsonnet: {}
-    path: http-echo
+    path: echo-service
     repoURL: https://github.com/esatterwhite/argo-local-dev
     targetRevision: HEAD
   syncPolicy:

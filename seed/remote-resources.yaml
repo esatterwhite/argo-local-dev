@@ -1,0 +1,18 @@
+apiVersion: "deploy.razee.io/v1alpha2"
+kind: RemoteResource
+metadata:
+  name: argo-applications
+  namespace: default
+spec:
+  clusterAuth:
+    impersonateUser: razeedeploy
+  backendService: git
+  requests:
+    - options:
+        git:
+          provider: 'github'
+          repo: "https://github.com/esatterwhite/argo-local-dev.git"
+          ref: "main"
+          filePath: "control/*.yaml"
+        headers:
+          Authorization: 'test'
