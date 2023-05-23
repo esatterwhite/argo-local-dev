@@ -12,6 +12,6 @@ if [ "${running}" == 'true' ]; then
 fi
 
 # desired cluster name; default is "kind"
-KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME:-k8s-workshop}"
+KIND_CLUSTER_NAME="${KIND_CLUSTER_NAME:-argo}"
 
 kind delete cluster --name $KIND_CLUSTER_NAME
