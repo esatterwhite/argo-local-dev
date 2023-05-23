@@ -1,8 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: default
+spec:
+  clusterResourceWhitelist:
+    - group: '*'
+      kind: '*'
+  destinations:
+    - namespace: '*'
+      server: '*'
+  sourceRepos:
+    - 'https://github.com/esatterwhite/*'
+---
 apiVersion: "deploy.razee.io/v1alpha2"
 kind: RemoteResource
 metadata:
   name: argo-applications
-  namespace: argo
+  namespace: default
 spec:
   clusterAuth:
     impersonateUser: razeedeploy
