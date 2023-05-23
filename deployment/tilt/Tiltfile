@@ -91,6 +91,16 @@ k8s_resource(
 )
 
 k8s_resource(
+  new_name='deployment'
+, objects=[
+     'esatterwhite:appproject'
+   , 'argo-applications:remoteresource'
+   ]
+, resource_deps=['argocd-application-controller', 'remoteresource-controller']
+, labels=['applications']
+)
+
+k8s_resource(
   new_name='razee-rbac'
 , objects=[
     'razeedeploy-sa:serviceaccount'
