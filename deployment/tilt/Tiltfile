@@ -1,0 +1,111 @@
+load('ext://namespace', 'namespace_create', 'namespace_inject')
+ARGO_NAMESPACE = 'argo'
+RAZEE_NAMESPACE = 'razee'
+
+namespace_create(ARGO_NAMESPACE, allow_duplicates=True)
+namespace_create(RAZEE_NAMESPACE, allow_duplicates=True)
+
+k8s_yaml(namespace_inject('argocd.yaml', ARGO_NAMESPACE), allow_duplicates=True)
+k8s_yaml(namespace_inject('razee.yaml', RAZEE_NAMESPACE), allow_duplicates=True)
+k8s_yaml('argo-applications.yaml', allow_duplicates=True)
+
+k8s_resource(
+  new_name='namespaces'
+, objects=[
+    '{}:namespace'.format(ARGO_NAMESPACE)
+  , '{}:namespace'.format(RAZEE_NAMESPACE)
+  ]
+)
+
+
+k8s_resource(
+  'argocd-redis'
+, resource_deps=['namespaces']
+, labels=['ArgoCD']
+)
+
+k8s_resource(
+  new_name='argo-rbac'
+, objects=[
+    'argocd-application-controller:serviceaccount'
+  , 'argocd-applicationset-controller:serviceaccount'
+  , 'argocd-dex-server:serviceaccount'
+  , 'argocd-notifications-controller:serviceaccount'
+  , 'argocd-redis:serviceaccount'
+  , 'argocd-repo-server:serviceaccount'
+  , 'argocd-server:serviceaccount'
+  , 'argocd-application-controller:role'
+  , 'argocd-applicationset-controller:role'
+  , 'argocd-dex-server:role'
+  , 'argocd-notifications-controller:role'
+  , 'argocd-server:role'
+  , 'argocd-application-controller:clusterrole'
+  , 'argocd-server:clusterrole'
+  , 'argocd-application-controller:rolebinding'
+  , 'argocd-applicationset-controller:rolebinding'
+  , 'argocd-dex-server:rolebinding'
+  , 'argocd-notifications-controller:rolebinding'
+  , 'argocd-redis:rolebinding'
+  , 'argocd-server:rolebinding'
+  , 'argocd-application-controller:clusterrolebinding'
+  , 'argocd-server:clusterrolebinding'
+  ]
+, resource_deps=['namespaces']
+, labels=['ArgoCD']
+)
+
+k8s_resource(
+  new_name='razee-rbac'
+, objects=[
+    'razeedeploy-sa:serviceaccount'
+  , 'razeedeploy-admin-cr:clusterrole'
+  , 'razeedeploy-rb:clusterrolebinding'
+  ]
+, resource_deps=['namespaces']
+, labels='ArgoCD'
+)
+
+k8s_resource(
+  'remoteresource-controller'
+, resource_deps=['namespaces', 'razee-rbac']
+, labels=['razee']
+)
+
+k8s_resource(
+  'argocd-repo-server'
+, resource_deps=['namespaces', 'argo-rbac', 'argocd-redis']
+, labels=['ArgoCD']
+)
+
+k8s_resource(
+  'argocd-application-controller'
+, resource_deps=['namespaces', 'argo-rbac', 'argocd-redis']
+, labels=['ArgoCD']
+)
+
+k8s_resource(
+  'argocd-notifications-controller'
+, resource_deps=['namespaces', 'argo-rbac', 'argocd-redis']
+, labels=['ArgoCD']
+)
+
+k8s_resource(
+  'argocd-applicationset-controller'
+, resource_deps=['namespaces', 'argo-rbac', 'argocd-redis']
+, labels=['ArgoCD']
+)
+
+k8s_resource(
+  'argocd-server'
+, resource_deps=['namespaces', 'argo-rbac', 'argocd-redis']
+, labels=['ArgoCD']
+, port_forwards=[
+    port_forward(8080,  name='Argo Admin UI', host='0.0.0.0', link_path='/')
+  ]
+)
+
+k8s_resource(
+  'argocd-dex-server'
+, resource_deps=['namespaces', 'argo-rbac']
+, labels=['ArgoCD']
+)

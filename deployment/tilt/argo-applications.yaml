@@ -2,7 +2,7 @@ apiVersion: "deploy.razee.io/v1alpha2"
 kind: RemoteResource
 metadata:
   name: argo-applications
-  namespace: default
+  namespace: argo
 spec:
   clusterAuth:
     impersonateUser: razeedeploy
