@@ -1,13 +1,27 @@
 load('ext://namespace', 'namespace_create', 'namespace_inject')
+load('ext://secret', 'secret_from_dict')
+
 ARGO_NAMESPACE = 'argo'
 RAZEE_NAMESPACE = 'razee'
+
+GITHUB_TOKEN = os.getenv('GITHUB_TOKEN', default='')
 
 namespace_create(ARGO_NAMESPACE, allow_duplicates=True)
 namespace_create(RAZEE_NAMESPACE, allow_duplicates=True)
 
 k8s_yaml(namespace_inject('argocd.yaml', ARGO_NAMESPACE), allow_duplicates=True)
 k8s_yaml(namespace_inject('razee.yaml', RAZEE_NAMESPACE), allow_duplicates=True)
-k8s_yaml('argo-applications.yaml', allow_duplicates=True)
+k8s_yaml(namespace_inject('argo-applications.yaml', ARGO_NAMESPACE), allow_duplicates=True)
+
+k8s_yaml(
+  secret_from_dict(
+    name = 'github'
+  , inputs = {
+      'token': GITHUB_TOKEN
+    }
+  )
+, allow_duplicates=True
+)
 
 k8s_resource(
   new_name='namespaces'
@@ -17,6 +31,12 @@ k8s_resource(
   ]
 )
 
+k8s_resource(
+  new_name='github-token'
+, objects = [
+    'github:secret'
+  ]
+)
 
 k8s_resource(
   'argocd-redis'
@@ -49,6 +69,22 @@ k8s_resource(
   , 'argocd-server:rolebinding'
   , 'argocd-application-controller:clusterrolebinding'
   , 'argocd-server:clusterrolebinding'
+  , 'argocd-cm:configmap'
+  , 'argocd-cmd-params-cm:configmap'
+  , 'argocd-gpg-keys-cm:configmap'
+  , 'argocd-notifications-cm:configmap'
+  , 'argocd-rbac-cm:configmap'
+  , 'argocd-ssh-known-hosts-cm:configmap'
+  , 'argocd-tls-certs-cm:configmap'
+  , 'argocd-notifications-secret:secret'
+  , 'argocd-secret:secret'
+  , 'argocd-application-controller-network-policy:networkpolicy'
+  , 'argocd-applicationset-controller-network-policy:networkpolicy'
+  , 'argocd-dex-server-network-policy:networkpolicy'
+  , 'argocd-notifications-controller-network-policy:networkpolicy'
+  , 'argocd-redis-network-policy:networkpolicy'
+  , 'argocd-repo-server-network-policy:networkpolicy'
+  , 'argocd-server-network-policy:networkpolicy'
   ]
 , resource_deps=['namespaces']
 , labels=['ArgoCD']
@@ -60,6 +96,7 @@ k8s_resource(
     'razeedeploy-sa:serviceaccount'
   , 'razeedeploy-admin-cr:clusterrole'
   , 'razeedeploy-rb:clusterrolebinding'
+  , 'razeedeploy-config:configmap'
   ]
 , resource_deps=['namespaces']
 , labels='ArgoCD'
@@ -67,7 +104,7 @@ k8s_resource(
 
 k8s_resource(
   'remoteresource-controller'
-, resource_deps=['namespaces', 'razee-rbac']
+, resource_deps=['namespaces', 'razee-rbac', 'github-token']
 , labels=['razee']
 )
 

@@ -1,9 +1,10 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  namespace: default
+  name: echo-service
   labels:
     app: echo-service
-  name: echo-service
 spec:
   replicas: 1
   selector:
@@ -40,4 +41,9 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: status.podIP
+          - name: WAVE_SYNCD
+            valueFrom:
+              configMapKeyRef:
+                name: echo-service
+                key: value
         resources: {}

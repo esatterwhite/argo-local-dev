@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: default
+  name: esatterwhite
 spec:
   clusterResourceWhitelist:
     - group: '*'
@@ -29,4 +29,9 @@ spec:
           ref: "main"
           filePath: "control/*.yaml"
         headers:
-          Authorization: 'test'
+          Authorization:
+            valueFrom:
+              secretKeyRef:
+                name: github
+                namespace: default
+                key: token
